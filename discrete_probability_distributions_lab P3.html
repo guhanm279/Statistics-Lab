@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIML Lab - Discrete Probability Distributions</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax for rendering Math formulas -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae0fd',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                    <div class="bg-brand-600 text-white p-2 rounded-lg flex items-center justify-center">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-brand-600 font-bold block">AIML Laboratory</span>
+                        <h1 class="text-lg font-bold text-slate-900 leading-none">Discrete Probability Distributions</h1>
+                    </div>
+                </div>
+                
+                <!-- Nav Tabs -->
+                <nav class="flex space-x-1 sm:space-x-3 items-center">
+                    <button onclick="switchTab('home')" id="tab-home" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:text-slate-900">
+                        Home
+                    </button>
+                    <button onclick="switchTab('binomial')" id="tab-binomial" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors text-brand-600 bg-brand-50 border border-brand-200">
+                        Binomial Distribution
+                    </button>
+                    <button disabled class="nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-400 cursor-not-allowed flex items-center gap-1">
+                        Poisson Distribution
+                        <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono border border-slate-200">Soon</span>
+                    </button>
+                    <button disabled class="nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-400 cursor-not-allowed flex items-center gap-1">
+                        Geometric Distribution
+                        <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono border border-slate-200">Soon</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- HOME PAGE MODULE -->
+        <section id="page-home" class="hidden space-y-8">
+            <!-- Hero / Overview -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm relative overflow-hidden">
+                <div class="max-w-3xl relative z-10">
+                    <span class="inline-block px-3 py-1 bg-brand-100 text-brand-700 text-xs font-semibold rounded-full mb-3">
+                        Undergraduate Curriculum Lab
+                    </span>
+                    <h2 class="text-3xl font-bold text-slate-900 tracking-tight mb-3">
+                        Discrete Probability Distributions
+                    </h2>
+                    <p class="text-slate-600 leading-relaxed text-base">
+                        Welcome to the interactive AIML laboratory environment. Discrete probability distributions model probabilistic events with countable outcomes. Select a module below to inspect parameter sensitivity and theoretical statistics.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Distribution Cards Grid -->
+            <div>
+                <h3 class="text-xl font-bold text-slate-900 mb-4">Laboratory Modules</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Binomial Card -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-brand-300 transition-all shadow-sm hover:shadow-md">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-emerald-100 text-emerald-800 font-semibold text-xs px-2.5 py-1 rounded-md border border-emerald-200 flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Module
+                                </span>
+                                <i data-lucide="binary" class="text-brand-600 w-5 h-5"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-slate-900 mb-1">Binomial Distribution</h4>
+                            <p class="text-slate-600 text-sm mb-4">
+                                Calculates exact moments, variance, skewness, and probability mass for $n$ trials with success rate $p$.
+                            </p>
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4 font-mono text-center text-sm text-slate-700">
+                                $$P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}$$
+                            </div>
+                        </div>
+                        <button onclick="switchTab('binomial')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                            Open Binomial Lab <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Poisson Card -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between opacity-80">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-2.5 py-1 rounded-md border border-slate-200">Coming Soon</span>
+                                <i data-lucide="clock" class="text-slate-400 w-5 h-5"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-slate-900 mb-1">Poisson Distribution</h4>
+                            <p class="text-slate-600 text-sm mb-4">
+                                Models event arrival frequency in fixed intervals with rate parameter $\lambda$.
+                            </p>
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4 font-mono text-center text-sm text-slate-700">
+                                $$P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}$$
+                            </div>
+                        </div>
+                        <button disabled class="w-full bg-slate-100 text-slate-400 font-medium py-2 px-4 rounded-lg text-sm cursor-not-allowed">
+                            Module Locked
+                        </button>
+                    </div>
+
+                    <!-- Geometric Card -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between opacity-80">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-slate-100 text-slate-600 font-semibold text-xs px-2.5 py-1 rounded-md border border-slate-200">Coming Soon</span>
+                                <i data-lucide="trending-down" class="text-slate-400 w-5 h-5"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-slate-900 mb-1">Geometric Distribution</h4>
+                            <p class="text-slate-600 text-sm mb-4">
+                                Models trial counts until the initial success outcome occurs.
+                            </p>
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4 font-mono text-center text-sm text-slate-700">
+                                $$P(X = k) = (1-p)^{k-1} p$$
+                            </div>
+                        </div>
+                        <button disabled class="w-full bg-slate-100 text-slate-400 font-medium py-2 px-4 rounded-lg text-sm cursor-not-allowed">
+                            Module Locked
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- BINOMIAL MODULE PAGE -->
+        <section id="page-binomial" class="space-y-6">
+            
+            <!-- Module Title & Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Binomial Distribution Module</h2>
+                    <p class="text-slate-500 text-sm">Interactive parameter configuration and analytical statistical computation</p>
+                </div>
+                <div class="text-sm bg-brand-50 text-brand-700 px-3.5 py-1.5 rounded-lg border border-brand-200 font-mono font-medium flex items-center gap-2">
+                    <i data-lucide="functions" class="w-4 h-4"></i> $X \sim \text{Bin}(n, p)$
+                </div>
+            </div>
+
+            <!-- Main Layout Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Controls Column (Left - 4 columns) -->
+                <div class="lg:col-span-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6 flex flex-col justify-between">
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="sliders" class="w-5 h-5 text-brand-600"></i> Parameters
+                            </h3>
+                            <button onclick="applyPreset(20, 0.35)" class="text-xs text-brand-600 hover:text-brand-800 font-semibold flex items-center gap-1">
+                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+                            </button>
+                        </div>
+
+                        <!-- Parameter Inputs -->
+                        <div class="space-y-5">
+                            
+                            <!-- Input 1: Number of Trials (n) -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <label for="num-n" class="text-sm font-semibold text-slate-800">
+                                        Number of Trials ($n$)
+                                    </label>
+                                    <span class="text-xs text-slate-400">Integer ($n \ge 1$)</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-3">
+                                    <input type="number" id="num-n" value="20" min="1" step="1" 
+                                        class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-slate-900 font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"
+                                        oninput="syncFromNumberN()">
+                                    <input type="range" id="slider-n" min="1" max="100" step="1" value="20" 
+                                        class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
+                                        oninput="syncFromSliderN()">
+                                </div>
+                                
+                                <div id="err-n" class="hidden flex items-center gap-1.5 p-2 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg font-medium">
+                                    <i data-lucide="alert-circle" class="w-4 h-4 text-red-500 shrink-0"></i>
+                                    <span id="err-n-msg">Must be a positive integer ($n \ge 1$).</span>
+                                </div>
+                            </div>
+
+                            <!-- Input 2: Probability of Success (p) -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <label for="num-p" class="text-sm font-semibold text-slate-800">
+                                        Probability of Success ($p$)
+                                    </label>
+                                    <span class="text-xs text-slate-400">Range: $0 \le p \le 1$</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-3">
+                                    <input type="number" id="num-p" value="0.35" min="0" max="1" step="0.01" 
+                                        class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-slate-900 font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"
+                                        oninput="syncFromNumberP()">
+                                    <input type="range" id="slider-p" min="0" max="1" step="0.01" value="0.35" 
+                                        class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
+                                        oninput="syncFromSliderP()">
+                                </div>
+                                
+                                <div id="err-p" class="hidden flex items-center gap-1.5 p-2 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg font-medium">
+                                    <i data-lucide="alert-circle" class="w-4 h-4 text-red-500 shrink-0"></i>
+                                    <span id="err-p-msg">Must be between $0.0$ and $1.0$.</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Presets Section -->
+                        <div class="pt-2 border-t border-slate-100">
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-2">
+                                Quick Presets
+                            </label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="applyPreset(20, 0.35)" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg text-left transition-colors">
+                                    🎯 Default ($n=20, p=0.35$)
+                                </button>
+                                <button onclick="applyPreset(10, 0.50)" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg text-left transition-colors">
+                                    🪙 Coin Flips ($n=10, p=0.5$)
+                                </button>
+                                <button onclick="applyPreset(15, 0.80)" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg text-left transition-colors">
+                                    📈 High Success ($n=15, p=0.8$)
+                                </button>
+                                <button onclick="applyPreset(50, 0.05)" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg text-left transition-colors">
+                                    ⚡ Rare Event ($n=50, p=0.05$)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parameter Validation Status -->
+                    <div class="pt-4">
+                        <div id="valid-status-badge" class="bg-emerald-100 text-emerald-800 text-xs px-3 py-2 rounded-lg font-semibold border border-emerald-200 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+                                Parameter State
+                            </span>
+                            <span id="status-text" class="font-mono">VALID</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Calculated Statistics Section (Right - 8 columns) -->
+                <div class="lg:col-span-8 space-y-6">
+                    
+                    <!-- Prompt 3 Statistic Cards Container -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="calculator" class="w-5 h-5 text-brand-600"></i> Binomial Statistical Moments & Properties
+                            </h3>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md font-mono border border-slate-200">
+                                Standard Formulas Applied
+                            </span>
+                        </div>
+
+                        <!-- Statistic Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            
+                            <!-- Card 1: Mean -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 hover:border-brand-300 transition-all">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-500">Mean ($\mu = \mathbb{E}[X]$)</span>
+                                    <span class="text-[10px] bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded font-mono font-semibold">$n \cdot p$</span>
+                                </div>
+                                <div id="card-mean" class="text-2xl font-bold text-slate-900 font-mono my-1">7.0000</div>
+                                <div class="text-[11px] text-slate-400 font-mono">Expected center of mass</div>
+                            </div>
+
+                            <!-- Card 2: Variance -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 hover:border-brand-300 transition-all">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-500">Variance ($\sigma^2$)</span>
+                                    <span class="text-[10px] bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded font-mono font-semibold">$n \cdot p(1-p)$</span>
+                                </div>
+                                <div id="card-variance" class="text-2xl font-bold text-brand-600 font-mono my-1">4.5500</div>
+                                <div class="text-[11px] text-slate-400 font-mono">Spread measure ($\text{Var}(X)$)</div>
+                            </div>
+
+                            <!-- Card 3: Standard Deviation -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 hover:border-brand-300 transition-all">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-500">Std Deviation ($\sigma$)</span>
+                                    <span class="text-[10px] bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded font-mono font-semibold">$\sqrt{\text{Var}(X)}$</span>
+                                </div>
+                                <div id="card-std" class="text-2xl font-bold text-slate-900 font-mono my-1">2.1331</div>
+                                <div class="text-[11px] text-slate-400 font-mono">Scale parameter</div>
+                            </div>
+
+                            <!-- Card 4: Second Moment -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 hover:border-brand-300 transition-all">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-500">2nd Moment ($\mathbb{E}[X^2]$)</span>
+                                    <span class="text-[10px] bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded font-mono font-semibold">$\text{Var} + \mu^2$</span>
+                                </div>
+                                <div id="card-second-moment" class="text-2xl font-bold text-slate-900 font-mono my-1">53.5500</div>
+                                <div class="text-[11px] text-slate-400 font-mono">Raw second moment</div>
+                            </div>
+
+                            <!-- Card 5: Skewness -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 hover:border-brand-300 transition-all">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-500">Skewness ($\gamma_1$)</span>
+                                    <span class="text-[10px] bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded font-mono font-semibold font-sans">$\frac{1-2p}{\sigma}$</span>
+                                </div>
+                                <div id="card-skewness" class="text-2xl font-bold text-slate-900 font-mono my-1">0.1406</div>
+                                <div id="card-skewness-desc" class="text-[11px] text-emerald-600 font-medium">Slight Right Skew</div>
+                            </div>
+
+                            <!-- Card 6: Failure Probability -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 hover:border-brand-300 transition-all">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-500">Failure Prob ($q$)</span>
+                                    <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono font-semibold">$1-p$</span>
+                                </div>
+                                <div id="card-q" class="text-2xl font-bold text-slate-700 font-mono my-1">0.6500</div>
+                                <div class="text-[11px] text-slate-400 font-mono">Single trial failure rate</div>
+                            </div>
+
+                        </div>
+
+                        <!-- Verification Callout Box for Default Parameters -->
+                        <div id="default-verification-box" class="bg-brand-50/70 border border-brand-200 rounded-xl p-4 text-xs text-brand-900 space-y-2">
+                            <div class="font-bold flex items-center gap-1.5 text-brand-800">
+                                <i data-lucide="check-circle" class="w-4 h-4 text-brand-600"></i>
+                                Analytical Verification ($n=20, p=0.35$)
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 font-mono text-[11px] text-slate-700">
+                                <div>• <strong>Mean ($\mu$):</strong> $20 \times 0.35 = \mathbf{7.0000}$</div>
+                                <div>• <strong>Variance ($\sigma^2$):</strong> $20 \times 0.35 \times 0.65 = \mathbf{4.5500}$</div>
+                                <div>• <strong>2nd Moment ($\mathbb{E}[X^2]$):</strong> $4.55 + 7^2 = \mathbf{53.5500}$</div>
+                                <div>• <strong>Skewness ($\gamma_1$):</strong> $(1 - 2(0.35)) / \sqrt{4.55} = 0.30 / 2.1331 = \mathbf{0.1406}$</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Binomial PMF Interactive Chart -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="bar-chart-2" class="w-5 h-5 text-brand-600"></i> Probability Mass Function (PMF) Visualization
+                            </h3>
+                            <span class="text-xs text-slate-500 font-mono">$P(X = k)$ for $0 \le k \le n$</span>
+                        </div>
+                        <div class="relative w-full h-[240px]">
+                            <canvas id="binomialChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Formula Breakdown Details Collapsible Card -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                        <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="book-open" class="w-4 h-4 text-brand-600"></i> Mathematical Formula Reference
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-600">
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 font-mono">
+                                <span class="font-bold text-slate-800">Mean:</span> $\mu = np$
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 font-mono">
+                                <span class="font-bold text-slate-800">Variance:</span> $\sigma^2 = np(1-p)$
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 font-mono">
+                                <span class="font-bold text-slate-800">2nd Moment:</span> $\mathbb{E}[X^2] = \text{Var}(X) + \mathbb{E}[X]^2$
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 font-mono">
+                                <span class="font-bold text-slate-800">Skewness:</span> $\gamma_1 = \frac{1-2p}{\sqrt{np(1-p)}}$
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- POISSON PLACEHOLDER PAGE -->
+        <section id="page-poisson" class="hidden">
+            <div class="bg-white rounded-xl border border-slate-200 p-12 text-center max-w-xl mx-auto space-y-4 shadow-sm">
+                <div class="bg-slate-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto text-slate-500">
+                    <i data-lucide="construction" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Poisson Distribution Module</h3>
+                <p class="text-slate-500 text-sm">This module is scheduled for upcoming laboratory exercises.</p>
+                <button onclick="switchTab('home')" class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Return to Home</button>
+            </div>
+        </section>
+
+        <!-- GEOMETRIC PLACEHOLDER PAGE -->
+        <section id="page-geometric" class="hidden">
+            <div class="bg-white rounded-xl border border-slate-200 p-12 text-center max-w-xl mx-auto space-y-4 shadow-sm">
+                <div class="bg-slate-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto text-slate-500">
+                    <i data-lucide="construction" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Geometric Distribution Module</h3>
+                <p class="text-slate-500 text-sm">This module is scheduled for upcoming laboratory exercises.</p>
+                <button onclick="switchTab('home')" class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Return to Home</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        let binomialChartInstance = null;
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Mathematical Helper: Combinations nCr
+        function combinations(n, k) {
+            if (k < 0 || k > n) return 0;
+            if (k === 0 || k === n) return 1;
+            if (k > n / 2) k = n - k;
+            let res = 1;
+            for (let i = 1; i <= k; i++) {
+                res = res * (n - i + 1) / i;
+            }
+            return res;
+        }
+
+        // Mathematical Helper: Binomial PMF Formula
+        function binomialPMF(n, p, k) {
+            if (k < 0 || k > n) return 0;
+            return combinations(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+        }
+
+        // Sync inputs when Number N changes
+        function syncFromNumberN() {
+            document.getElementById('slider-n').value = document.getElementById('num-n').value;
+            validateAndCalculateBinomial();
+        }
+
+        // Sync inputs when Slider N changes
+        function syncFromSliderN() {
+            document.getElementById('num-n').value = document.getElementById('slider-n').value;
+            validateAndCalculateBinomial();
+        }
+
+        // Sync inputs when Number P changes
+        function syncFromNumberP() {
+            document.getElementById('slider-p').value = document.getElementById('num-p').value;
+            validateAndCalculateBinomial();
+        }
+
+        // Sync inputs when Slider P changes
+        function syncFromSliderP() {
+            document.getElementById('num-p').value = document.getElementById('slider-p').value;
+            validateAndCalculateBinomial();
+        }
+
+        // Apply Quick Preset Values
+        function applyPreset(nVal, pVal) {
+            document.getElementById('num-n').value = nVal;
+            document.getElementById('slider-n').value = nVal;
+            document.getElementById('num-p').value = pVal;
+            document.getElementById('slider-p').value = pVal;
+            validateAndCalculateBinomial();
+        }
+
+        // Prompt 3: Calculate and validate Binomial statistics
+        function validateAndCalculateBinomial() {
+            const inputN = document.getElementById('num-n').value;
+            const inputP = document.getElementById('num-p').value;
+
+            const n = Number(inputN);
+            const p = Number(inputP);
+
+            const errNBox = document.getElementById('err-n');
+            const errNMsg = document.getElementById('err-n-msg');
+            const inputNEl = document.getElementById('num-n');
+
+            const errPBox = document.getElementById('err-p');
+            const errPMsg = document.getElementById('err-p-msg');
+            const inputPEl = document.getElementById('num-p');
+
+            const statusBadge = document.getElementById('valid-status-badge');
+            const statusText = document.getElementById('status-text');
+
+            let isValid = true;
+
+            // Validate n: must be a positive integer (n >= 1)
+            if (isNaN(n) || !Number.isInteger(n) || n < 1) {
+                isValid = false;
+                errNBox.classList.remove('hidden');
+                inputNEl.classList.add('border-red-500', 'bg-red-50');
+                if (n < 1) errNMsg.innerText = "Value of n must be at least 1.";
+                else if (!Number.isInteger(n)) errNMsg.innerText = "Value of n must be a whole integer.";
+                else errNMsg.innerText = "Please enter a valid positive integer.";
+            } else {
+                errNBox.classList.add('hidden');
+                inputNEl.classList.remove('border-red-500', 'bg-red-50');
+            }
+
+            // Validate p: must be between 0 and 1 inclusive
+            if (isNaN(p) || p < 0 || p > 1) {
+                isValid = false;
+                errPBox.classList.remove('hidden');
+                inputPEl.classList.add('border-red-500', 'bg-red-50');
+                if (p < 0) errPMsg.innerText = "Probability p cannot be negative.";
+                else if (p > 1) errPMsg.innerText = "Probability p cannot exceed 1.0.";
+                else errPMsg.innerText = "Please enter a value between 0 and 1.";
+            } else {
+                errPBox.classList.add('hidden');
+                inputPEl.classList.remove('border-red-500', 'bg-red-50');
+            }
+
+            // Handle invalid state in UI
+            if (!isValid) {
+                statusBadge.className = "bg-red-100 text-red-800 text-xs px-3 py-2 rounded-lg font-semibold border border-red-200 flex items-center justify-between";
+                statusText.innerText = "INVALID INPUT";
+
+                // Clear displays
+                document.getElementById('card-mean').innerText = "—";
+                document.getElementById('card-variance').innerText = "—";
+                document.getElementById('card-std').innerText = "—";
+                document.getElementById('card-second-moment').innerText = "—";
+                document.getElementById('card-skewness').innerText = "—";
+                document.getElementById('card-q').innerText = "—";
+                return;
+            }
+
+            // Valid status indicator update
+            statusBadge.className = "bg-emerald-100 text-emerald-800 text-xs px-3 py-2 rounded-lg font-semibold border border-emerald-200 flex items-center justify-between";
+            statusText.innerText = "VALID";
+
+            // Prompt 3 Formulas Execution:
+            // 1. Mean = np
+            const mean = n * p;
+            
+            // 2. Variance = np(1-p)
+            const q = 1 - p;
+            const variance = n * p * q;
+            
+            // 3. Standard Deviation = sqrt(np(1-p))
+            const stdDev = Math.sqrt(variance);
+            
+            // 4. Second Moment = Variance + Mean^2
+            const secondMoment = variance + Math.pow(mean, 2);
+            
+            // 5. Skewness = (1 - 2p) / sqrt(np(1-p))
+            let skewness = 0;
+            if (stdDev !== 0) {
+                skewness = (1 - (2 * p)) / stdDev;
+            }
+
+            // Format outputs to 4 decimal places
+            document.getElementById('card-mean').innerText = mean.toFixed(4);
+            document.getElementById('card-variance').innerText = variance.toFixed(4);
+            document.getElementById('card-std').innerText = stdDev.toFixed(4);
+            document.getElementById('card-second-moment').innerText = secondMoment.toFixed(4);
+            document.getElementById('card-skewness').innerText = skewness.toFixed(4);
+            document.getElementById('card-q').innerText = q.toFixed(4);
+
+            // Skewness interpretation text
+            const skewDesc = document.getElementById('card-skewness-desc');
+            if (Math.abs(skewness) < 0.0001) {
+                skewDesc.innerText = "Symmetric (Zero Skew)";
+                skewDesc.className = "text-[11px] text-brand-600 font-medium";
+            } else if (skewness > 0) {
+                skewDesc.innerText = "Right Skewed (+ve)";
+                skewDesc.className = "text-[11px] text-amber-600 font-medium";
+            } else {
+                skewDesc.innerText = "Left Skewed (-ve)";
+                skewDesc.className = "text-[11px] text-purple-600 font-medium";
+            }
+
+            // Highlight verification box if default parameters n=20, p=0.35 are active
+            const defaultBox = document.getElementById('default-verification-box');
+            if (n === 20 && Math.abs(p - 0.35) < 0.001) {
+                defaultBox.classList.remove('opacity-40');
+            } else {
+                defaultBox.classList.add('opacity-40');
+            }
+
+            // Re-render MathJax formula notation
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise();
+            }
+
+            // Render PMF Chart
+            updateChart(n, p);
+        }
+
+        // Render or Refresh PMF Bar Chart
+        function updateChart(n, p) {
+            const ctx = document.getElementById('binomialChart').getContext('2d');
+            const labels = [];
+            const data = [];
+
+            for (let k = 0; k <= n; k++) {
+                labels.push(k);
+                data.push(binomialPMF(n, p, k));
+            }
+
+            if (binomialChartInstance) {
+                binomialChartInstance.data.labels = labels;
+                binomialChartInstance.data.datasets[0].data = data;
+                binomialChartInstance.update('none');
+            } else {
+                binomialChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'P(X = k)',
+                            data: data,
+                            backgroundColor: 'rgba(37, 99, 235, 0.75)',
+                            borderColor: 'rgb(29, 78, 216)',
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: (items) => `k = ${items[0].label} successes`,
+                                    label: (item) => `P(X = ${item.label}) = ${item.raw.toFixed(4)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Outcome k (Number of Successes)', font: { size: 11, weight: '600' } },
+                                grid: { display: false }
+                            },
+                            y: {
+                                title: { display: true, text: 'Probability P(X = k)', font: { size: 11, weight: '600' } },
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Tab Navigation Switcher
+        function switchTab(tabName) {
+            const tabs = ['home', 'binomial', 'poisson', 'geometric'];
+            
+            tabs.forEach(tab => {
+                const page = document.getElementById(`page-${tab}`);
+                const btn = document.getElementById(`tab-${tab}`);
+
+                if (tab === tabName) {
+                    page.classList.remove('hidden');
+                    if (btn) btn.className = 'nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors text-brand-600 bg-brand-50 border border-brand-200';
+                } else {
+                    page.classList.add('hidden');
+                    if (btn) btn.className = 'nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:text-slate-900';
+                }
+            });
+
+            if (tabName === 'binomial') {
+                validateAndCalculateBinomial();
+            }
+        }
+
+        // Initialization
+        window.onload = function() {
+            validateAndCalculateBinomial();
+        };
+    </script>
+</body>
+</html>
