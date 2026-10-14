@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discrete Probability Distributions - AIML Laboratory</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --secondary: #4f46e5;
+            --accent: #0d9488;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #0f172a;
+                --surface: #1e293b;
+                --text-main: #f8fafc;
+                --text-muted: #94a3b8;
+                --border: #334155;
+                --primary-light: #1e3a8a;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+
+        /* Header Navigation */
+        header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.5px;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .nav-btn.active {
+            color: var(--primary);
+            background-color: var(--primary-light);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1280px;
+            margin: 2rem auto 0;
+            padding: 0 1.5rem;
+        }
+
+        .page-module {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .page-module.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography & Utility */
+        h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        h2 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-main); }
+        h3 { font-size: 1.15rem; margin-bottom: 0.75rem; }
+        p { color: var(--text-muted); margin-bottom: 1rem; }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        /* Layout Grids */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Cards & Panels */
+        .card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 4px solid var(--primary);
+        }
+
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .stat-card .formula {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin: 0.25rem 0;
+        }
+
+        .stat-card .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 0.25rem;
+        }
+
+        /* Math Display */
+        .math-block {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-family: "KaTeX_Main", "Times New Roman", serif;
+            font-size: 1.15rem;
+            margin: 1rem 0;
+            color: var(--text-main);
+            overflow-x: auto;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text-main);
+        }
+
+        input[type="number"], select, textarea {
+            width: 100%;
+            padding: 0.65rem 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background-color: var(--surface);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="number"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .validation-msg {
+            font-size: 0.8rem;
+            color: var(--danger);
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.65rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* SVG Chart Containers */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 340px;
+            background-color: var(--surface);
+            border-radius: var(--radius-md);
+            padding: 10px;
+        }
+
+        svg.chart {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .bar {
+            fill: var(--primary);
+            transition: height 0.3s ease, y 0.3s ease, fill 0.2s ease;
+            cursor: pointer;
+        }
+
+        .bar:hover {
+            fill: var(--secondary);
+        }
+
+        .bar-geometric { fill: var(--accent); }
+        .bar-geometric:hover { fill: #0f766e; }
+
+        .axis-line {
+            stroke: var(--border);
+            stroke-width: 1.5;
+        }
+
+        .grid-line {
+            stroke: var(--border);
+            stroke-width: 1;
+            stroke-dasharray: 2 2;
+            opacity: 0.5;
+        }
+
+        .axis-text {
+            font-size: 11px;
+            fill: var(--text-muted);
+            text-anchor: middle;
+        }
+
+        .axis-title {
+            font-size: 12px;
+            font-weight: 600;
+            fill: var(--text-main);
+        }
+
+        .mean-line {
+            stroke: var(--danger);
+            stroke-width: 2;
+            stroke-dasharray: 4 4;
+        }
+
+        .mean-label {
+            font-size: 11px;
+            font-weight: 700;
+            fill: var(--danger);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            padding: 0.5rem 0.75rem;
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+            font-size: 0.8rem;
+            border-radius: var(--radius-sm);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            z-index: 10;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Exercise Module Styling */
+        .exercise-box {
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--accent);
+            border-radius: var(--radius-md);
+            background-color: var(--surface);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .question-item {
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .question-item:last-child {
+            border-bottom: none;
+        }
+
+        .question-title {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+        }
+
+        .result-pill {
+            display: inline-block;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+
+        .legend-container {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                height: auto;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            nav {
+                width: 100%;
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding-bottom: 0.25rem;
+            }
+            .nav-btn {
+                white-space: nowrap;
+                padding: 0.5rem 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <span class="logo-badge">AIML</span>
+                <span class="logo-title">Discrete Probability Distributions</span>
+            </div>
+            <nav>
+                <button class="nav-btn active" onclick="switchTab('home')">Home</button>
+                <button class="nav-btn" onclick="switchTab('binomial')">Binomial</button>
+                <button class="nav-btn" onclick="switchTab('poisson')">Poisson</button>
+                <button class="nav-btn" onclick="switchTab('geometric')">Geometric</button>
+                <button class="nav-btn" onclick="switchTab('exercises')">Lab Exercises</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- HOME MODULE -->
+        <section id="module-home" class="page-module active">
+            <h1>Discrete Probability Distributions</h1>
+            <p class="subtitle">An Interactive Laboratory for Artificial Intelligence & Machine Learning Students</p>
+
+            <div class="card" style="margin-bottom: 2rem;">
+                <h2>Introduction to Discrete Random Variables</h2>
+                <p>In Machine Learning and Pattern Recognition, random variables are used to model uncertain events, noise, dataset sampling, and algorithmic decisions. A <strong>Discrete Random Variable</strong> is a variable whose possible values are countable outcomes (e.g., non-negative integers).</p>
+                <p>A <strong>Probability Mass Function (PMF)</strong> defines the exact probability $P(X = k)$ that a discrete random variable equals a specific value $k$, satisfying $\sum P(X=k) = 1$. The <strong>Cumulative Distribution Function (CDF)</strong> measures the probability that $X$ takes a value less than or equal to $k$, denoted $P(X \le k)$.</p>
+            </div>
+
+            <div class="grid-3">
+                <div class="card" style="border-top: 4px solid var(--primary);">
+                    <h3>Binomial Distribution</h3>
+                    <div class="math-block">X ~ Binomial(n, p)</div>
+                    <p>Models the total number of successes in <em>n</em> independent Bernoulli trials, each having a constant probability of success <em>p</em>.</p>
+                    <p><strong>Common Uses:</strong> Classification model accuracy over batch, A/B testing conversions.</p>
+                    <button class="btn btn-secondary" onclick="switchTab('binomial')">Open Binomial Module &rarr;</button>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--secondary);">
+                    <h3>Poisson Distribution</h3>
+                    <div class="math-block">X ~ Poisson(&lambda;)</div>
+                    <p>Models the number of independent events occurring within a fixed time window or spatial region at a constant average rate <em>&lambda;</em>.</p>
+                    <p><strong>Common Uses:</strong> Server API request arrival rates, network packet loss, rare anomaly occurrences.</p>
+                    <button class="btn btn-secondary" onclick="switchTab('poisson')">Open Poisson Module &rarr;</button>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--accent);">
+                    <h3>Geometric Distribution</h3>
+                    <div class="math-block">X ~ Geometric(p)</div>
+                    <p>Models the total number of independent trials required to observe the very first success, where each trial has success probability <em>p</em>.</p>
+                    <p><strong>Common Uses:</strong> Time-to-failure analysis, search algorithm attempts, reinforcement learning goal search.</p>
+                    <button class="btn btn-secondary" onclick="switchTab('geometric')">Open Geometric Module &rarr;</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Laboratory Instructions</h3>
+                <p>Use the navigation tabs above or the interactive module buttons to navigate between distribution calculators. You can adjust parameters, view dynamic statistical moments, inspect interactive PMF charts with mean markers, and complete the guided lab exercises.</p>
+            </div>
+        </section>
+
+        <!-- BINOMIAL MODULE -->
+        <section id="module-binomial" class="page-module">
+            <h1>Binomial Distribution Module</h1>
+            <p class="subtitle">Modeling Successes in Fixed Independent Trials</p>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="math-block">X ~ Binomial(n, p) &nbsp;&nbsp;|&nbsp;&nbsp; P(X = k) = &binom;{n}{k} p^k (1-p)^{n-k}</div>
+                <p>The Binomial distribution describes the count of successes in <em>n</em> independent experiments with success probability <em>p</em> and failure probability <em>q = 1 - p</em>.</p>
+            </div>
+
+            <!-- Binomial Inputs -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>Parameter Controls</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="bin-n">Number of Trials (n):</label>
+                        <input type="number" id="bin-n" value="20" min="1" max="500" step="1" oninput="updateBinomial()">
+                        <div id="bin-n-err" class="validation-msg">Must be a positive integer (&ge; 1).</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bin-p">Probability of Success (p):</label>
+                        <input type="number" id="bin-p" value="0.35" min="0" max="1" step="0.01" oninput="updateBinomial()">
+                        <div id="bin-p-err" class="validation-msg">Must be between 0.0 and 1.0 inclusive.</div>
+                    </div>
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 0;">Active parameters: <strong>n = <span id="bin-val-n">20</span></strong>, <strong>p = <span id="bin-val-p">0.35</span></strong>, <strong>1 - p = <span id="bin-val-q">0.65</span></strong></p>
+            </div>
+
+            <!-- Binomial Statistics Cards -->
+            <div class="grid-5">
+                <div class="stat-card">
+                    <div class="label">Mean E[X]</div>
+                    <div class="formula">n &middot; p</div>
+                    <div class="value" id="bin-stat-mean">7</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Variance Var(X)</div>
+                    <div class="formula">n &middot; p &middot; (1-p)</div>
+                    <div class="value" id="bin-stat-var">4.55</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Std Deviation &sigma;</div>
+                    <div class="formula">&radic;(Var)</div>
+                    <div class="value" id="bin-stat-sd">2.1331</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">2nd Moment E[X&sup2;]</div>
+                    <div class="formula">Var + (Mean)&sup2;</div>
+                    <div class="value" id="bin-stat-m2">53.55</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Skewness &gamma;&thinsp;&frac12;</div>
+                    <div class="formula">(1-2p) / &sigma;</div>
+                    <div class="value" id="bin-stat-skew">0.1404</div>
+                </div>
+            </div>
+
+            <!-- Binomial PMF & CDF Calculators -->
+            <div class="grid-2">
+                <div class="card">
+                    <h3>PMF Calculator: P(X = k)</h3>
+                    <div class="form-group">
+                        <label for="bin-k-pmf">Success Count (k):</label>
+                        <input type="number" id="bin-k-pmf" value="7" min="0" step="1" oninput="updateBinomial()">
+                        <div id="bin-k-pmf-err" class="validation-msg">k must be an integer between 0 and n.</div>
+                    </div>
+                    <div class="math-block" id="bin-pmf-res">P(X = 7) = 0.1844 (18.44%)</div>
+                    <p>The probability of obtaining exactly <em>k</em> successes in <em>n</em> independent trials.</p>
+                </div>
+
+                <div class="card">
+                    <h3>CDF Calculator: P(X &le; k)</h3>
+                    <div class="form-group">
+                        <label for="bin-k-cdf">Threshold Count (k):</label>
+                        <input type="number" id="bin-k-cdf" value="7" min="0" step="1" oninput="updateBinomial()">
+                        <div id="bin-k-cdf-err" class="validation-msg">k must be an integer between 0 and n.</div>
+                    </div>
+                    <div class="math-block" id="bin-cdf-res">P(X &le; 7) = 0.6010 | P(X &gt; 7) = 0.3990</div>
+                    <p>P(X &le; k) means the probability of getting k or fewer successes.</p>
+                </div>
+            </div>
+
+            <!-- Binomial Chart -->
+            <div class="card">
+                <h3>Binomial Probability Mass Function (PMF) Graph</h3>
+                <div class="chart-wrapper">
+                    <div id="bin-tooltip" class="tooltip"></div>
+                    <svg id="bin-chart" class="chart"></svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- POISSON MODULE -->
+        <section id="module-poisson" class="page-module">
+            <h1>Poisson Distribution Module</h1>
+            <p class="subtitle">Modeling Rare Event Counts per Fixed Interval</p>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="math-block">X ~ Poisson(&lambda;) &nbsp;&nbsp;|&nbsp;&nbsp; P(X = k) = (e^{-\lambda} &middot; &lambda;^k) / k!</div>
+                <p>The Poisson distribution expresses the probability of a given number of events occurring in a fixed interval of time or space if these events occur with a known constant rate &lambda;.</p>
+            </div>
+
+            <!-- Poisson Inputs -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>Parameter Controls</h3>
+                <div class="form-group">
+                    <label for="poi-lambda">Average Number of Events (&lambda;):</label>
+                    <input type="number" id="poi-lambda" value="6" min="0" max="100" step="0.1" oninput="updatePoisson()">
+                    <div id="poi-lambda-err" class="validation-msg">Must be a non-negative finite number (&ge; 0).</div>
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 0;">Active parameter: <strong>&lambda; = <span id="poi-val-lambda">6</span></strong></p>
+            </div>
+
+            <!-- Poisson Statistics Cards -->
+            <div class="grid-3">
+                <div class="stat-card">
+                    <div class="label">Mean E[X]</div>
+                    <div class="formula">&lambda;</div>
+                    <div class="value" id="poi-stat-mean">6</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Variance Var(X)</div>
+                    <div class="formula">&lambda;</div>
+                    <div class="value" id="poi-stat-var">6</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Std Deviation &sigma;</div>
+                    <div class="formula">&radic;(&lambda;)</div>
+                    <div class="value" id="poi-stat-sd">2.4495</div>
+                </div>
+            </div>
+
+            <!-- Poisson PMF & CDF Calculators -->
+            <div class="grid-2">
+                <div class="card">
+                    <h3>PMF Calculator: P(X = k)</h3>
+                    <div class="form-group">
+                        <label for="poi-k-pmf">Event Count (k):</label>
+                        <input type="number" id="poi-k-pmf" value="6" min="0" step="1" oninput="updatePoisson()">
+                        <div id="poi-k-pmf-err" class="validation-msg">k must be a non-negative integer (&ge; 0).</div>
+                    </div>
+                    <div class="math-block" id="poi-pmf-res">P(X = 6) = 0.1606 (16.06%)</div>
+                    <p>The result is the probability of observing exactly k events during the specified interval.</p>
+                </div>
+
+                <div class="card">
+                    <h3>CDF Calculator: P(X &le; k)</h3>
+                    <div class="form-group">
+                        <label for="poi-k-cdf">Threshold Count (k):</label>
+                        <input type="number" id="poi-k-cdf" value="6" min="0" step="1" oninput="updatePoisson()">
+                        <div id="poi-k-cdf-err" class="validation-msg">k must be a non-negative integer (&ge; 0).</div>
+                    </div>
+                    <div class="math-block" id="poi-cdf-res">P(X &le; 6) = 0.6063 | P(X &gt; 6) = 0.3937</div>
+                    <p>P(X &le; k) means the probability of observing k or fewer events.</p>
+                </div>
+            </div>
+
+            <!-- Poisson Main Graph -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>Poisson Probability Mass Function (PMF) Graph</h3>
+                <div class="chart-wrapper">
+                    <div id="poi-tooltip" class="tooltip"></div>
+                    <svg id="poi-chart" class="chart"></svg>
+                </div>
+                <p style="font-size: 0.8rem; text-align: right; color: var(--text-muted); margin-top: 0.5rem;">Note: Poisson distribution theoretical support is infinite ($k \in \{0, 1, 2, ...\}$). The graph displays a truncated finite range capturing over 99.99% of total probability mass.</p>
+            </div>
+
+            <!-- Poisson Comparison Graphs -->
+            <div class="card">
+                <h3>Poisson Multi-Rate Parameter Comparison</h3>
+                <p>Comparing Poisson distributions with rates <strong>&lambda; = 2</strong>, <strong>&lambda; = 6</strong>, and <strong>&lambda; = 10</strong> over a common event scale:</p>
+                <div class="chart-wrapper" style="height: 360px;">
+                    <div id="poi-comp-tooltip" class="tooltip"></div>
+                    <svg id="poi-comp-chart" class="chart"></svg>
+                </div>
+                <div class="legend-container">
+                    <div class="legend-item"><div class="legend-color" style="background: #2563eb;"></div> &lambda; = 2</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #10b981;"></div> &lambda; = 6</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #f59e0b;"></div> &lambda; = 10</div>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.9rem; background-color: var(--background); padding: 1rem; border-radius: var(--radius-sm);">
+                    <strong>Key Statistical Observations:</strong> As &lambda; increases, the distribution's mode and center shift rightward toward higher event counts, the absolute spread (variance) widens, and the distribution becomes symmetric, approaching a Normal distribution shape.
+                </div>
+            </div>
+        </section>
+
+        <!-- GEOMETRIC MODULE -->
+        <section id="module-geometric" class="page-module">
+            <h1>Geometric Distribution Module</h1>
+            <p class="subtitle">Modeling Waiting Time Until First Success</p>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="math-block">X ~ Geometric(p) &nbsp;&nbsp;|&nbsp;&nbsp; P(X = k) = (1-p)^{k-1} &middot; p &nbsp;&nbsp; (k = 1, 2, 3, ...)</div>
+                <p>The Geometric distribution models the total number of independent trials required to obtain the <em>first</em> success in repeated trials with constant probability <em>p</em>.</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;"><strong>AIML Application Context:</strong> Testing an AI classifier model repeatedly until its first successful target detection on a continuous stream of noisy sensor inputs.</p>
+            </div>
+
+            <!-- Geometric Inputs -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>Parameter Controls</h3>
+                <div class="form-group">
+                    <label for="geo-p">Probability of Success on Each Trial (p):</label>
+                    <input type="number" id="geo-p" value="0.5" min="0.001" max="1" step="0.01" oninput="updateGeometric()">
+                    <div id="geo-p-err" class="validation-msg">Probability p must satisfy 0 &lt; p &le; 1.0.</div>
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 0;">Active parameter: <strong>p = <span id="geo-val-p">0.5</span></strong></p>
+            </div>
+
+            <!-- Geometric Statistics Cards -->
+            <div class="grid-5">
+                <div class="stat-card">
+                    <div class="label">Mean E[X]</div>
+                    <div class="formula">1 / p</div>
+                    <div class="value" id="geo-stat-mean">2</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Variance Var(X)</div>
+                    <div class="formula">(1-p) / p&sup2;</div>
+                    <div class="value" id="geo-stat-var">2</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Std Deviation &sigma;</div>
+                    <div class="formula">&radic;(Var)</div>
+                    <div class="value" id="geo-stat-sd">1.4142</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">2nd Moment E[X&sup2;]</div>
+                    <div class="formula">(2-p) / p&sup2;</div>
+                    <div class="value" id="geo-stat-m2">6</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Skewness &gamma;&thinsp;&frac12;</div>
+                    <div class="formula">(2-p) / &radic;(1-p)</div>
+                    <div class="value" id="geo-stat-skew">2.1213</div>
+                </div>
+            </div>
+
+            <!-- Geometric PMF & CDF Calculators -->
+            <div class="grid-2">
+                <div class="card">
+                    <h3>PMF Calculator: P(X = k)</h3>
+                    <div class="form-group">
+                        <label for="geo-k-pmf">Trial Number of 1st Success (k):</label>
+                        <input type="number" id="geo-k-pmf" value="3" min="1" step="1" oninput="updateGeometric()">
+                        <div id="geo-k-pmf-err" class="validation-msg">k must be a positive integer (&ge; 1).</div>
+                    </div>
+                    <div class="math-block" id="geo-pmf-res">P(X = 3) = 0.1250 (12.50%)</div>
+                    <p>The probability is the chance that the first success occurs on exactly the kth trial.</p>
+                </div>
+
+                <div class="card">
+                    <h3>CDF Calculator: P(X &le; k)</h3>
+                    <div class="form-group">
+                        <label for="geo-k-cdf">Threshold Trial Number (k):</label>
+                        <input type="number" id="geo-k-cdf" value="3" min="1" step="1" oninput="updateGeometric()">
+                        <div id="geo-k-cdf-err" class="validation-msg">k must be a positive integer (&ge; 1).</div>
+                    </div>
+                    <div class="math-block" id="geo-cdf-res">P(X &le; 3) = 0.8750 | P(X &gt; 3) = 0.1250</div>
+                    <p>P(X &le; k) is the probability that the first success occurs within the first k trials.</p>
+                </div>
+            </div>
+
+            <!-- Geometric Graph -->
+            <div class="card">
+                <h3>Geometric Probability Mass Function (PMF) Graph</h3>
+                <div class="chart-wrapper">
+                    <div id="geo-tooltip" class="tooltip"></div>
+                    <svg id="geo-chart" class="chart"></svg>
+                </div>
+                <p style="font-size: 0.8rem; text-align: right; color: var(--text-muted); margin-top: 0.5rem;">Note: Geometric support is infinite ($k \in \{1, 2, 3, ...\}$). Plot range is truncated to capture &gt; 99.9% of total probability mass.</p>
+            </div>
+        </section>
+
+        <!-- LAB EXERCISES MODULE -->
+        <section id="module-exercises" class="page-module">
+            <h1>AIML Laboratory Exercises</h1>
+            <p class="subtitle">Practical Hands-On Computations and Model Interpretations</p>
+
+            <!-- EXERCISE 1 -->
+            <div class="exercise-box">
+                <h2>Exercise 1: Interactive Binomial Distribution Analysis</h2>
+                <p>A supervised machine learning model is tested across 15 independent test samples with a known single-sample detection accuracy of $p = 0.60$.</p>
+                <button class="btn" onclick="loadExercise1()" style="margin-bottom: 1.25rem;">⚡ Load Exercise 1 Values (n=15, p=0.6)</button>
+
+                <div class="question-item">
+                    <div class="question-title">Q1: Calculate the Mean and Variance of correct detections.</div>
+                    <p>Formula: $E[X] = np$, $\text{Var}(X) = np(1-p)$</p>
+                    <div class="result-pill">Expected Result: Mean = 9.0, Variance = 3.60</div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-title">Q2: Compute the probability of obtaining exactly 9 correct detections.</div>
+                    <p>Formula: $P(X = 9) = \binom{15}{9} (0.6)^9 (0.4)^6$</p>
+                    <div class="result-pill">Expected Result: P(X = 9) &approx; 0.2066</div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-title">Q3: Compute the cumulative probability of obtaining at most 10 correct detections.</div>
+                    <p>Formula: $P(X \le 10) = \sum_{i=0}^{10} P(X = i)$</p>
+                    <div class="result-pill">Expected Result: P(X &le; 10) &approx; 0.7869</div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-title">Q4 & Q5: Observations & Student Inference</div>
+                    <p>Observe the Binomial graph for $n=15, p=0.6$. Write your analytical conclusion below:</p>
+                    <textarea rows="3" id="ex1-inference">For 15 independent trials with a success probability of 0.6, the expected number of successes is 9. The highest probability occurs at 9 successes, and the probabilities decrease toward the extreme outcomes.</textarea>
+                </div>
+            </div>
+
+            <!-- EXERCISE 2 -->
+            <div class="exercise-box">
+                <h2>Exercise 2: Interactive Poisson Event Rate Analysis</h2>
+                <p>An AI-based server monitoring system records anomaly events during a fixed observation interval. The average number of events during that interval is $\lambda = 6$.</p>
+                <button class="btn" onclick="loadExercise2()" style="margin-bottom: 1.25rem;">⚡ Load Exercise 2 Values (&lambda;=6)</button>
+
+                <div class="question-item">
+                    <div class="question-title">Q1: Determine the Mean and Variance of incoming anomaly events.</div>
+                    <p>Formula: $E[X] = \lambda$, $\text{Var}(X) = \lambda$</p>
+                    <div class="result-pill">Expected Result: Mean = 6.0, Variance = 6.0</div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-title">Q2: Calculate the probability of observing exactly 8 anomaly events.</div>
+                    <p>Formula: $P(X = 8) = \frac{e^{-6} \cdot 6^8}{8!}$</p>
+                    <div class="result-pill">Expected Result: P(X = 8) &approx; 0.1033</div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-title">Q3: Calculate the probability of observing at most 5 events.</div>
+                    <p>Formula: $P(X \le 5) = \sum_{i=0}^{5} \frac{e^{-6} \cdot 6^i}{i!}$</p>
+                    <div class="result-pill">Expected Result: P(X &le; 5) &approx; 0.4457</div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-title">Q4 & Q5: Comparison Analysis & Student Inference</div>
+                    <p>Refer to the Poisson Multi-Rate Comparison Chart (&lambda;=2, 6, 10) and record your observation:</p>
+                    <textarea rows="3" id="ex2-inference">As &lambda; increases from 2 to 6 to 10, the distribution shifts toward larger event counts and its absolute spread increases. The distribution also becomes relatively less right-skewed.</textarea>
+                </div>
+            </div>
+
+            <!-- EXERCISE 3 -->
+            <div class="exercise-box">
+                <h2>Exercise 3: Interactive Geometric First-Success Waiting Time</h2>
+                <p>An automated web scraper query attempts to connect to a target server with a successful connection probability of $p = 0.5$ on each independent attempt.</p>
+                <button class="btn" onclick="loadExercise3()" style="margin-bottom: 1.25rem;">⚡ Load Exercise 3 Values (p=0.5)</button>
+
+                <div class="question-item">
+                    <div class="question-title">Q1: Calculate the Expected Mean number of attempts until first success and Variance.</div>
+                    <p>Formula: $E[X] = \frac{1}{p}$, $\text{Var}(X) = \frac{1-p}{p^2}$</p>
+                    <div class="result-pill">Expected Result: Mean = 2.0 attempts, Variance = 2.0</div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-title">Q2: Calculate the probability that the first successful connection occurs on exactly the 3rd attempt.</div>
+                    <p>Formula: $P(X = 3) = (1 - 0.5)^{2} \cdot (0.5)$</p>
+                    <div class="result-pill">Expected Result: P(X = 3) = 0.1250</div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-title">Q3: Compute the probability that success is achieved within 3 attempts.</div>
+                    <p>Formula: $P(X \le 3) = 1 - (1 - 0.5)^3$</p>
+                    <div class="result-pill">Expected Result: P(X &le; 3) = 0.8750</div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-title">Q4 & Q5: Graph Inspection & Student Inference</div>
+                    <p>Observe the Geometric PMF chart trend and document your analytical finding:</p>
+                    <textarea rows="3" id="ex3-inference">When the success probability is 0.5 on every independent trial, the first trial has the highest probability of success. The probability that the first success occurs on a later trial decreases geometrically, and the expected waiting time is two trials.</textarea>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- APPLICATION LOGIC -->
+    <script>
+        /* TAB NAVIGATION LOGIC */
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.page-module').forEach(mod => mod.classList.remove('active'));
+
+            const selectedNav = Array.from(document.querySelectorAll('.nav-btn')).find(btn => 
+                btn.getAttribute('onclick').includes(tabId)
+            );
+            if (selectedNav) selectedNav.classList.add('active');
+
+            const targetModule = document.getElementById('module-' + tabId);
+            if (targetModule) targetModule.classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Refresh charts when switching tabs to ensure proper SVG rendering bounds
+            if (tabId === 'binomial') updateBinomial();
+            if (tabId === 'poisson') updatePoisson();
+            if (tabId === 'geometric') updateGeometric();
+        }
+
+        /* NUMERICALLY STABLE MATHEMATICAL FUNCTIONS */
+        // Natural logarithm of factorial using Lanczos approximation for Gamma function: ln(n!) = ln(Gamma(n+1))
+        function logGamma(n) {
+            if (n <= 0) return 0;
+            const c = [
+                76.18009172947146, -86.50532032941677,
+                24.01409824083091, -1.231739572450155,
+                0.1208650973866179e-2, -0.5395239384953e-5
+            ];
+            let x = n;
+            let y = n;
+            let tmp = x + 5.5;
+            tmp -= (x + 0.5) * Math.log(tmp);
+            let ser = 1.000000000190015;
+            for (let j = 0; j <= 5; j++) {
+                y += 1;
+                ser += c[j] / y;
+            }
+            return -tmp + Math.log(2.5066282746310005 * ser / x);
+        }
+
+        function logFactorial(n) {
+            if (n < 0) return 0;
+            if (n <= 1) return 0;
+            return logGamma(n + 1);
+        }
+
+        function logCombination(n, k) {
+            if (k < 0 || k > n) return -Infinity;
+            if (k === 0 || k === n) return 0;
+            return logFactorial(n) - logFactorial(k) - logFactorial(n - k);
+        }
+
+        /* BINOMIAL DISTRIBUTION MODULE */
+        function calculateBinomialPMF(n, p, k) {
+            if (k < 0 || k > n) return 0;
+            if (p === 0) return k === 0 ? 1 : 0;
+            if (p === 1) return k === n ? 1 : 0;
+            const logP = logCombination(n, k) + (k * Math.log(p)) + ((n - k) * Math.log(1 - p));
+            return Math.exp(logP);
+        }
+
+        function updateBinomial() {
+            const nInput = document.getElementById('bin-n');
+            const pInput = document.getElementById('bin-p');
+            const kPmfInput = document.getElementById('bin-k-pmf');
+            const kCdfInput = document.getElementById('bin-k-cdf');
+
+            const n = parseInt(nInput.value);
+            const p = parseFloat(pInput.value);
+
+            let valid = true;
+
+            if (isNaN(n) || n < 1 || !Number.isInteger(n)) {
+                document.getElementById('bin-n-err').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('bin-n-err').style.display = 'none';
+            }
+
+            if (isNaN(p) || p < 0 || p > 1) {
+                document.getElementById('bin-p-err').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('bin-p-err').style.display = 'none';
+            }
+
+            if (!valid) return;
+
+            document.getElementById('bin-val-n').innerText = n;
+            document.getElementById('bin-val-p').innerText = p.toFixed(4);
+            document.getElementById('bin-val-q').innerText = (1 - p).toFixed(4);
+
+            // Statistical calculations
+            const mean = n * p;
+            const variance = n * p * (1 - p);
+            const sd = Math.sqrt(variance);
+            const m2 = variance + (mean * mean);
+            const skewness = (variance === 0) ? "Undefined" : ((1 - 2 * p) / sd).toFixed(4);
+
+            document.getElementById('bin-stat-mean').innerText = mean.toFixed(4).replace(/\.?0+$/, "");
+            document.getElementById('bin-stat-var').innerText = variance.toFixed(4).replace(/\.?0+$/, "");
+            document.getElementById('bin-stat-sd').innerText = sd.toFixed(4);
+            document.getElementById('bin-stat-m2').innerText = m2.toFixed(4).replace(/\.?0+$/, "");
+            document.getElementById('bin-stat-skew').innerText = skewness;
+
+            // PMF Calculator
+            const kPmf = parseInt(kPmfInput.value);
+            if (isNaN(kPmf) || kPmf < 0 || kPmf > n) {
+                document.getElementById('bin-k-pmf-err').style.display = 'block';
+            } else {
+                document.getElementById('bin-k-pmf-err').style.display = 'none';
+                const pmfVal = calculateBinomialPMF(n, p, kPmf);
+                document.getElementById('bin-pmf-res').innerText = 
+                    `P(X = ${kPmf}) = ${pmfVal.toFixed(4)} (${(pmfVal * 100).toFixed(2)}%)`;
+            }
+
+            // CDF Calculator
+            const kCdf = parseInt(kCdfInput.value);
+            if (isNaN(kCdf) || kCdf < 0 || kCdf > n) {
+                document.getElementById('bin-k-cdf-err').style.display = 'block';
+            } else {
+                document.getElementById('bin-k-cdf-err').style.display = 'none';
+                let cdfVal = 0;
+                for (let i = 0; i <= kCdf; i++) {
+                    cdfVal += calculateBinomialPMF(n, p, i);
+                }
+                cdfVal = Math.min(1.0, cdfVal);
+                const compCdf = Math.max(0.0, 1.0 - cdfVal);
+                document.getElementById('bin-cdf-res').innerText = 
+                    `P(X \u2264 ${kCdf}) = ${cdfVal.toFixed(4)} | P(X > ${kCdf}) = ${compCdf.toFixed(4)}`;
+            }
+
+            // Draw Chart
+            const data = [];
+            for (let i = 0; i <= n; i++) {
+                data.push({ x: i, y: calculateBinomialPMF(n, p, i) });
+            }
+            renderSVGChart('bin-chart', 'bin-tooltip', data, mean, "Number of Successes (X)", "Probability P(X)");
+        }
+
+        /* POISSON DISTRIBUTION MODULE */
+        function calculatePoissonPMF(lambda, k) {
+            if (k < 0) return 0;
+            if (lambda === 0) return k === 0 ? 1 : 0;
+            const logP = -lambda + (k * Math.log(lambda)) - logFactorial(k);
+            return Math.exp(logP);
+        }
+
+        function updatePoisson() {
+            const lambdaInput = document.getElementById('poi-lambda');
+            const kPmfInput = document.getElementById('poi-k-pmf');
+            const kCdfInput = document.getElementById('poi-k-cdf');
+
+            const lambda = parseFloat(lambdaInput.value);
+
+            if (isNaN(lambda) || lambda < 0) {
+                document.getElementById('poi-lambda-err').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('poi-lambda-err').style.display = 'none';
+            }
+
+            document.getElementById('poi-val-lambda').innerText = lambda;
+
+            // Stats
+            const mean = lambda;
+            const variance = lambda;
+            const sd = Math.sqrt(lambda);
+
+            document.getElementById('poi-stat-mean').innerText = mean.toFixed(4).replace(/\.?0+$/, "");
+            document.getElementById('poi-stat-var').innerText = variance.toFixed(4).replace(/\.?0+$/, "");
+            document.getElementById('poi-stat-sd').innerText = sd.toFixed(4);
+
+            // PMF Calculator
+            const kPmf = parseInt(kPmfInput.value);
+            if (isNaN(kPmf) || kPmf < 0) {
+                document.getElementById('poi-k-pmf-err').style.display = 'block';
+            } else {
+                document.getElementById('poi-k-pmf-err').style.display = 'none';
+                const pmfVal = calculatePoissonPMF(lambda, kPmf);
+                document.getElementById('poi-pmf-res').innerText = 
+                    `P(X = ${kPmf}) = ${pmfVal.toFixed(4)} (${(pmfVal * 100).toFixed(2)}%)`;
+            }
+
+            // CDF Calculator
+            const kCdf = parseInt(kCdfInput.value);
+            if (isNaN(kCdf) || kCdf < 0) {
+                document.getElementById('poi-k-cdf-err').style.display = 'block';
+            } else {
+                document.getElementById('poi-k-cdf-err').style.display = 'none';
+                let cdfVal = 0;
+                for (let i = 0; i <= kCdf; i++) {
+                    cdfVal += calculatePoissonPMF(lambda, i);
+                }
+                cdfVal = Math.min(1.0, cdfVal);
+                const compCdf = Math.max(0.0, 1.0 - cdfVal);
+                document.getElementById('poi-cdf-res').innerText = 
+                    `P(X \u2264 ${kCdf}) = ${cdfVal.toFixed(4)} | P(X > ${kCdf}) = ${compCdf.toFixed(4)}`;
+            }
+
+            // Dynamic X Range calculation to cover 99.99% mass
+            const maxRange = Math.max(12, Math.ceil(lambda + 4 * (Math.sqrt(lambda) || 1)));
+            const data = [];
+            for (let i = 0; i <= maxRange; i++) {
+                data.push({ x: i, y: calculatePoissonPMF(lambda, i) });
+            }
+            renderSVGChart('poi-chart', 'poi-tooltip', data, mean, "Number of Events (X)", "Probability P(X)");
+
+            // Render Multi-Poisson Comparison Chart
+            renderPoissonComparison();
+        }
+
+        function renderPoissonComparison() {
+            const svg = document.getElementById('poi-comp-chart');
+            const tooltip = document.getElementById('poi-comp-tooltip');
+            svg.innerHTML = '';
+
+            const lambdas = [
+                { l: 2, color: '#2563eb' },
+                { l: 6, color: '#10b981' },
+                { l: 10, color: '#f59e0b' }
+            ];
+
+            const maxX = 22;
+            const padding = { top: 30, right: 30, bottom: 40, left: 50 };
+            const width = svg.clientWidth || 600;
+            const height = svg.clientHeight || 340;
+
+            const plotWidth = width - padding.left - padding.right;
+            const plotHeight = height - padding.top - padding.bottom;
+
+            // Maximum probability across all series for scaling Y axis
+            let maxY = 0.30; 
+
+            // Axes
+            const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            xAxis.setAttribute("x1", padding.left);
+            xAxis.setAttribute("y1", height - padding.bottom);
+            xAxis.setAttribute("x2", width - padding.right);
+            xAxis.setAttribute("y2", height - padding.bottom);
+            xAxis.setAttribute("class", "axis-line");
+            svg.appendChild(xAxis);
+
+            // Draw line series for each lambda
+            lambdas.forEach(series => {
+                let pathD = "";
+                for (let x = 0; x <= maxX; x++) {
+                    const yVal = calculatePoissonPMF(series.l, x);
+                    const cx = padding.left + (x / maxX) * plotWidth;
+                    const cy = height - padding.bottom - (yVal / maxY) * plotHeight;
+
+                    pathD += (x === 0 ? "M " : " L ") + cx + " " + cy;
+
+                    // Plot point marker
+                    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    circle.setAttribute("cx", cx);
+                    circle.setAttribute("cy", cy);
+                    circle.setAttribute("r", 4);
+                    circle.setAttribute("fill", series.color);
+                    circle.style.cursor = "pointer";
+
+                    circle.addEventListener("mousemove", (e) => {
+                        tooltip.style.opacity = '1';
+                        tooltip.style.left = (e.offsetX + 10) + 'px';
+                        tooltip.style.top = (e.offsetY - 25) + 'px';
+                        tooltip.innerHTML = `<strong>&lambda; = ${series.l}</strong><br>X = ${x}<br>P(X) = ${yVal.toFixed(4)}`;
+                    });
+                    circle.addEventListener("mouseleave", () => tooltip.style.opacity = '0');
+
+                    svg.appendChild(circle);
+                }
+
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", pathD);
+                path.setAttribute("fill", "none");
+                path.setAttribute("stroke", series.color);
+                path.setAttribute("stroke-width", "2.5");
+                svg.appendChild(path);
+            });
+
+            // X-Axis Labels
+            for (let x = 0; x <= maxX; x += 2) {
+                const cx = padding.left + (x / maxX) * plotWidth;
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", cx);
+                text.setAttribute("y", height - padding.bottom + 18);
+                text.setAttribute("class", "axis-text");
+                text.textContent = x;
+                svg.appendChild(text);
+            }
+        }
+
+        /* GEOMETRIC DISTRIBUTION MODULE */
+        function calculateGeometricPMF(p, k) {
+            if (k < 1) return 0;
+            if (p === 1) return k === 1 ? 1 : 0;
+            return Math.pow(1 - p, k - 1) * p;
+        }
+
+        function updateGeometric() {
+            const pInput = document.getElementById('geo-p');
+            const kPmfInput = document.getElementById('geo-k-pmf');
+            const kCdfInput = document.getElementById('geo-k-cdf');
+
+            const p = parseFloat(pInput.value);
+
+            if (isNaN(p) || p <= 0 || p > 1) {
+                document.getElementById('geo-p-err').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('geo-p-err').style.display = 'none';
+            }
+
+            document.getElementById('geo-val-p').innerText = p.toFixed(4);
+
+            // Stats
+            const mean = 1 / p;
+            const variance = (1 - p) / (p * p);
+            const sd = Math.sqrt(variance);
+            const m2 = (2 - p) / (p * p);
+            const skewness = (p === 1) ? "Undefined" : ((2 - p) / Math.sqrt(1 - p)).toFixed(4);
+
+            document.getElementById('geo-stat-mean').innerText = mean.toFixed(4).replace(/\.?0+$/, "");
+            document.getElementById('geo-stat-var').innerText = variance.toFixed(4).replace(/\.?0+$/, "");
+            document.getElementById('geo-stat-sd').innerText = sd.toFixed(4);
+            document.getElementById('geo-stat-m2').innerText = m2.toFixed(4).replace(/\.?0+$/, "");
+            document.getElementById('geo-stat-skew').innerText = skewness;
+
+            // PMF Calculator
+            const kPmf = parseInt(kPmfInput.value);
+            if (isNaN(kPmf) || kPmf < 1) {
+                document.getElementById('geo-k-pmf-err').style.display = 'block';
+            } else {
+                document.getElementById('geo-k-pmf-err').style.display = 'none';
+                const pmfVal = calculateGeometricPMF(p, kPmf);
+                document.getElementById('geo-pmf-res').innerText = 
+                    `P(X = ${kPmf}) = ${pmfVal.toFixed(4)} (${(pmfVal * 100).toFixed(2)}%)`;
+            }
+
+            // CDF Calculator
+            const kCdf = parseInt(kCdfInput.value);
+            if (isNaN(kCdf) || kCdf < 1) {
+                document.getElementById('geo-k-cdf-err').style.display = 'block';
+            } else {
+                document.getElementById('geo-k-cdf-err').style.display = 'none';
+                const cdfVal = 1 - Math.pow(1 - p, kCdf);
+                const compCdf = Math.pow(1 - p, kCdf);
+                document.getElementById('geo-cdf-res').innerText = 
+                    `P(X \u2264 ${kCdf}) = ${cdfVal.toFixed(4)} | P(X > ${kCdf}) = ${compCdf.toFixed(4)}`;
+            }
+
+            // X Range calculation
+            const maxRange = Math.min(30, Math.max(10, Math.ceil(4 / p)));
+            const data = [];
+            for (let i = 1; i <= maxRange; i++) {
+                data.push({ x: i, y: calculateGeometricPMF(p, i) });
+            }
+            renderSVGChart('geo-chart', 'geo-tooltip', data, mean, "Trial Number of First Success (X)", "Probability P(X)", true);
+        }
+
+        /* REUSABLE SVG BAR CHART RENDERER */
+        function renderSVGChart(svgId, tooltipId, data, meanVal, xAxisTitle, yAxisTitle, isGeometric = false) {
+            const svg = document.getElementById(svgId);
+            const tooltip = document.getElementById(tooltipId);
+            svg.innerHTML = '';
+
+            const padding = { top: 30, right: 30, bottom: 45, left: 55 };
+            const width = svg.clientWidth || 600;
+            const height = svg.clientHeight || 340;
+
+            const plotWidth = width - padding.left - padding.right;
+            const plotHeight = height - padding.top - padding.bottom;
+
+            const maxY = Math.max(0.1, Math.max(...data.map(d => d.y)) * 1.15);
+
+            // Grid Lines & Y Axis
+            const yTicks = 5;
+            for (let i = 0; i <= yTicks; i++) {
+                const yVal = (maxY / yTicks) * i;
+                const cy = height - padding.bottom - (yVal / maxY) * plotHeight;
+
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", padding.left);
+                line.setAttribute("y1", cy);
+                line.setAttribute("x2", width - padding.right);
+                line.setAttribute("y2", cy);
+                line.setAttribute("class", "grid-line");
+                svg.appendChild(line);
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", padding.left - 8);
+                text.setAttribute("y", cy + 4);
+                text.setAttribute("class", "axis-text");
+                text.setAttribute("text-anchor", "end");
+                text.textContent = yVal.toFixed(3);
+                svg.appendChild(text);
+            }
+
+            // Axes Lines
+            const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            xAxis.setAttribute("x1", padding.left);
+            xAxis.setAttribute("y1", height - padding.bottom);
+            xAxis.setAttribute("x2", width - padding.right);
+            xAxis.setAttribute("y2", height - padding.bottom);
+            xAxis.setAttribute("class", "axis-line");
+            svg.appendChild(xAxis);
+
+            const barCount = data.length;
+            const barWidth = Math.max(2, (plotWidth / barCount) * 0.65);
+
+            data.forEach((d) => {
+                const cx = padding.left + ((d.x - data[0].x + 0.5) / barCount) * plotWidth;
+                const barH = (d.y / maxY) * plotHeight;
+                const cy = height - padding.bottom - barH;
+
+                const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rect.setAttribute("x", cx - barWidth / 2);
+                rect.setAttribute("y", cy);
+                rect.setAttribute("width", barWidth);
+                rect.setAttribute("height", barH);
+                rect.setAttribute("class", isGeometric ? "bar bar-geometric" : "bar");
+                rect.setAttribute("rx", "2");
+
+                // Hover Tooltip
+                rect.addEventListener("mousemove", (e) => {
+                    tooltip.style.opacity = '1';
+                    tooltip.style.left = (e.offsetX + 10) + 'px';
+                    tooltip.style.top = (e.offsetY - 25) + 'px';
+                    tooltip.innerHTML = `<strong>X = ${d.x}</strong><br>P(X) = ${d.y.toFixed(4)}`;
+                });
+                rect.addEventListener("mouseleave", () => tooltip.style.opacity = '0');
+
+                svg.appendChild(rect);
+
+                // X-Axis Labels (sample every few labels if dense)
+                const step = Math.ceil(barCount / 25);
+                if (d.x % step === 0) {
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", cx);
+                    text.setAttribute("y", height - padding.bottom + 18);
+                    text.setAttribute("class", "axis-text");
+                    text.textContent = d.x;
+                    svg.appendChild(text);
+                }
+            });
+
+            // Vertical Mean Marker Line
+            if (meanVal >= data[0].x && meanVal <= data[data.length - 1].x) {
+                const meanX = padding.left + ((meanVal - data[0].x + 0.5) / barCount) * plotWidth;
+
+                const meanLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                meanLine.setAttribute("x1", meanX);
+                meanLine.setAttribute("y1", padding.top);
+                meanLine.setAttribute("x2", meanX);
+                meanLine.setAttribute("y2", height - padding.bottom);
+                meanLine.setAttribute("class", "mean-line");
+                svg.appendChild(meanLine);
+
+                const meanTag = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                meanTag.setAttribute("x", meanX);
+                meanTag.setAttribute("y", padding.top - 8);
+                meanTag.setAttribute("class", "mean-label");
+                meanTag.setAttribute("text-anchor", "middle");
+                meanTag.textContent = `\u03BC = ${meanVal.toFixed(2)}`;
+                svg.appendChild(meanTag);
+            }
+        }
+
+        /* LAB EXERCISE LOADER FUNCTIONS */
+        function loadExercise1() {
+            switchTab('binomial');
+            document.getElementById('bin-n').value = 15;
+            document.getElementById('bin-p').value = 0.6;
+            document.getElementById('bin-k-pmf').value = 9;
+            document.getElementById('bin-k-cdf').value = 10;
+            updateBinomial();
+        }
+
+        function loadExercise2() {
+            switchTab('poisson');
+            document.getElementById('poi-lambda').value = 6;
+            document.getElementById('poi-k-pmf').value = 8;
+            document.getElementById('poi-k-cdf').value = 5;
+            updatePoisson();
+        }
+
+        function loadExercise3() {
+            switchTab('geometric');
+            document.getElementById('geo-p').value = 0.5;
+            document.getElementById('geo-k-pmf').value = 3;
+            document.getElementById('geo-k-cdf').value = 3;
+            updateGeometric();
+        }
+
+        /* INITIALIZATION ON PAGE LOAD */
+        window.onload = function() {
+            updateBinomial();
+            updatePoisson();
+            updateGeometric();
+
+            // Window resize handler for dynamic graph scaling
+            window.addEventListener('resize', () => {
+                updateBinomial();
+                updatePoisson();
+                updateGeometric();
+            });
+        };
+    </script>
+</body>
+</html>
